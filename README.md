@@ -1,17 +1,18 @@
-# Recharge.af Android app
+# Recharge.af Android app — version 1.1.0
 
-A native Android shell around the existing HTTPS Recharge.af customer website. Registration, sign-in, wallet balance, operator detection, custom airtime and order creation all use the existing website and database. No API credentials are stored in the app. Website updates appear automatically in the app.
+The app opens https://recharge.af in Android WebView. Registration, top-up orders, customer balances, and support continue to use the live website. The native app provides the branded header and bottom navigation.
 
-## Build an APK
+## Build on Windows with Android Studio
+1. Extract this ZIP into a folder.
+2. Open the folder in Android Studio and allow Gradle sync. Install Android SDK Platform 35 when prompted.
+3. Select **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
+4. Find the installable debug APK in `app/build/outputs/apk/debug/app-debug.apk`.
+5. To update an already installed app, the new APK must be signed with the same key as the old installation. Debug APK signatures differ between build machines; if Android says it cannot update the app, uninstall the old debug app first. Uninstalling can remove the app's local session; your server account remains available for login.
 
-Open this folder in Android Studio (JDK 17, Android SDK 35). Let Gradle sync, then choose **Build > Build APK(s)**. The debug APK appears at `app/build/outputs/apk/debug/app-debug.apk`. For public distribution, use **Build > Generate Signed Bundle / APK** and a private release signing key.
+## Branding
+- `app/src/main/res/drawable/recharge_logo.png`: full horizontal logo in the native toolbar.
+- `app/src/main/res/drawable/ic_launcher_foreground.png`: symbol for the adaptive launcher icon.
+- `app/src/main/res/mipmap-*/ic_launcher.png`: launcher images for older Android versions.
+- `app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml`: adaptive icon configuration.
 
-Android Gradle Plugin 8.7.3 and Gradle 8.9 are suitable. If Android Studio asks for a Gradle wrapper, create one via the IDE or an installed Gradle 8.9 runtime. Keep the app package `af.recharge.app` unless you intentionally choose a different Play Store ID.
-
-The app needs internet and Android System WebView. It only loads HTTPS pages from recharge.af inside the app; WhatsApp links open externally. Customer sessions are stored as normal website cookies. The native bottom tabs open Home, Orders, Balance and Help.
-
-This workspace had no Android SDK/Gradle, so no compiled APK or device test was possible here. Before distribution, build in Android Studio and test registration, login, wallet, custom top-up, back navigation, and WhatsApp on a device. Use a separate test user and avoid real supplier deductions during app QA.
-
-## Codemagic option
-
-If you already use Codemagic, put this project in a Git repository and import it there. The included `codemagic.yaml` runs `gradle :app:assembleDebug` and publishes the debug APK as an artifact. A debug APK is for private testing; sign a release APK or AAB for distribution.
+Version 1.1.0 uses the same application ID (`af.recharge.app`) and website URL. The order and database logic remains on Recharge.af. This source package does not include a compiled APK.

@@ -16,6 +16,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,8 +24,9 @@ import android.widget.Toast;
 
 public final class MainActivity extends Activity {
     private static final String ROOT = "https://recharge.af/";
-    private static final int INK = Color.rgb(16,36,26);
-    private static final int GREEN = Color.rgb(31,211,111);
+    private static final int INK = Color.rgb(14,45,91);
+    private static final int BLUE = Color.rgb(14,75,222);
+    private static final int MUTED = Color.rgb(102,119,139);
     private WebView webView;
     private ProgressBar progress;
     private LinearLayout navigation;
@@ -47,10 +49,10 @@ public final class MainActivity extends Activity {
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         LinearLayout page=new LinearLayout(this);page.setOrientation(LinearLayout.VERTICAL);page.setBackgroundColor(Color.WHITE);
-        LinearLayout header=new LinearLayout(this);header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(20),dp(7),dp(20),dp(7));header.setBackgroundColor(INK);
-        TextView logo=new TextView(this);logo.setText("R");logo.setTextColor(INK);logo.setTypeface(null,Typeface.BOLD);logo.setTextSize(21);logo.setGravity(Gravity.CENTER);logo.setBackground(background(GREEN,12));header.addView(logo,new LinearLayout.LayoutParams(dp(39),dp(39)));
-        TextView title=new TextView(this);title.setText(" Recharge.af");title.setTextColor(Color.WHITE);title.setTypeface(null,Typeface.BOLD);title.setTextSize(19);header.addView(title);
-        page.addView(header,new LinearLayout.LayoutParams(-1,dp(58)));
+        LinearLayout header=new LinearLayout(this);header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(18),dp(7),dp(18),dp(7));header.setBackgroundColor(Color.WHITE);
+        ImageView logo=new ImageView(this);logo.setImageResource(R.drawable.recharge_logo);logo.setScaleType(ImageView.ScaleType.FIT_CENTER);header.addView(logo,new LinearLayout.LayoutParams(dp(180),dp(52)));
+        TextView secure=new TextView(this);secure.setText("●  SECURE TOP-UP");secure.setTextColor(MUTED);secure.setTypeface(null,Typeface.BOLD);secure.setTextSize(10);secure.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);header.addView(secure,new LinearLayout.LayoutParams(0,dp(40),1));
+        page.addView(header,new LinearLayout.LayoutParams(-1,dp(66)));
         FrameLayout content=new FrameLayout(this);
         webView=new WebView(this);webView.setBackgroundColor(Color.WHITE);webView.getSettings().setJavaScriptEnabled(true);webView.getSettings().setDomStorageEnabled(true);
         webView.getSettings().setSupportMultipleWindows(true);webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
@@ -63,7 +65,7 @@ public final class MainActivity extends Activity {
                 CookieManager.getInstance().flush();
                 if(internal(Uri.parse(url))) {
                     // The native toolbar and tabs replace the site's header on small screens.
-                    view.evaluateJavascript("(function(){if(document.getElementById('recharge-app-style'))return;var s=document.createElement('style');s.id='recharge-app-style';s.textContent='.site-header,.dash-header,footer,.intro{display:none!important}.hero{display:block!important;padding:18px 0 35px!important}.hero:after{display:none!important}.recharge-card{box-shadow:none!important}.dashboard-main{padding-top:20px!important}.auth-shell{min-height:auto!important;padding:18px!important}';document.head.appendChild(s)})()",null);
+                    view.evaluateJavascript("(function(){if(document.getElementById('recharge-app-style'))return;var s=document.createElement('style');s.id='recharge-app-style';s.textContent='.site-header,.dash-header,footer,.intro{display:none!important}.hero{display:block!important;padding:18px 0 35px!important}.hero:after{display:none!important}.recharge-card{box-shadow:none!important}.dashboard-main{padding-top:20px!important}.auth-shell{min-height:auto!important;padding:18px!important}body{--green:#06baa9;--deep:#0e2d5b;--ink:#123568;--bg:#f3f8fc}.primary-btn,.small-btn{background:#0e4bde!important}.operator.selected,.product.selected{border-color:#06baa9!important}.how{background:#0e2d5b!important}';document.head.appendChild(s)})()",null);
                 }
             }
         });
@@ -82,15 +84,16 @@ public final class MainActivity extends Activity {
         content.addView(webView,new FrameLayout.LayoutParams(-1,-1));
         progress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);progress.setMax(100);content.addView(progress,new FrameLayout.LayoutParams(-1,dp(3),Gravity.TOP));
         page.addView(content,new LinearLayout.LayoutParams(-1,0,1));
-        navigation=new LinearLayout(this);navigation.setGravity(Gravity.CENTER);navigation.setPadding(dp(6),dp(6),dp(6),dp(6));navigation.setBackgroundColor(Color.WHITE);
-        addNav("⌂","Home",()->load("index.php"));addNav("▣","Orders",()->load("account.php"));addNav("◉","Balance",()->load("account.php"));addNav("✉","Help",()->external(Uri.parse("https://wa.me/971553251586")));
-        page.addView(navigation,new LinearLayout.LayoutParams(-1,dp(66)));setContentView(page);
+        navigation=new LinearLayout(this);navigation.setGravity(Gravity.CENTER);navigation.setPadding(dp(8),dp(6),dp(8),dp(6));navigation.setBackgroundColor(Color.WHITE);navigation.setElevation(dp(8));
+        addNav("⌂","Home",()->load("index.php"),true);addNav("▣","Orders",()->load("account.php"),false);addNav("◉","Balance",()->load("account.php"),false);addNav("✉","Help",()->external(Uri.parse("https://wa.me/971553251586")),false);
+        page.addView(navigation,new LinearLayout.LayoutParams(-1,dp(72)));setContentView(page);
         if(state==null)load("index.php");else webView.restoreState(state);
     }
-    private void addNav(String icon,String label,Runnable action) {
+    private void addNav(String icon,String label,Runnable action,boolean selected) {
         LinearLayout item=new LinearLayout(this);item.setGravity(Gravity.CENTER);item.setOrientation(LinearLayout.VERTICAL);
-        TextView symbol=new TextView(this);symbol.setText(icon);symbol.setTextSize(22);symbol.setTextColor(INK);symbol.setGravity(Gravity.CENTER);
-        TextView text=new TextView(this);text.setText(label);text.setTextSize(11);text.setTextColor(INK);text.setGravity(Gravity.CENTER);
+        if(selected)item.setBackground(background(Color.rgb(231,248,248),17));
+        TextView symbol=new TextView(this);symbol.setText(icon);symbol.setTextSize(22);symbol.setTextColor(selected?BLUE:MUTED);symbol.setGravity(Gravity.CENTER);
+        TextView text=new TextView(this);text.setText(label);text.setTextSize(11);text.setTypeface(null,Typeface.BOLD);text.setTextColor(selected?BLUE:MUTED);text.setGravity(Gravity.CENTER);
         item.addView(symbol);item.addView(text);item.setOnClickListener(v->action.run());navigation.addView(item,new LinearLayout.LayoutParams(0,-1,1));
     }
     @Override protected void onSaveInstanceState(Bundle state) { webView.saveState(state);super.onSaveInstanceState(state); }
